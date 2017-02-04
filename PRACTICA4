@@ -1,0 +1,67 @@
+create table trabajador (seguro_social integer, 
+                         nombre varchar2 (80), 
+                         paterno varchar2(80),
+                         
+       CONSTRAINT PK_trabajador PRIMARY KEY(seguro_social));  --Constraint es para la tabla de rompimiento donde inicializamos la PK 
+       
+       --Creamos la secuencia para la nomina 
+       
+       create sequence sec_nomica
+       start with 1
+       increment by 1
+       nomaxvalue;
+       
+       -- TABLAS CON FK.... CREAMOS LA 2° TABLA 
+       
+       create table nomina (id_nomina integer,
+                            seguro_social integer,
+                            horas_laboradas integer,
+                            fecha_pago date,
+                            saldo float,
+                            
+        constraint PK_id_nomina_ Primary key (id_nomina),   -- LOS CONTRAINTS SIEMPRE VAN SEPARADOS POR UN ENTER
+        constraint FK1_seguro_social foreign key (seguro_social)
+        references trabajador(seguro_social));   -- TABLA Y CAMPO AL QUE HACE REFERENCIA
+       
+       -- PROCEDIMIENTO para guardar TRABAJADOR 
+       
+       create or replace procedure GUARDAR_TRABAJADOR (my_id in integer, my_nombre in varchar2, my_paterno in varchar2) as 
+       begin 
+       insert into trabajador values (my_id, my_nombre, my_paterno);
+       end;
+       /
+       
+       
+       create or replace procedure GUARDAR_NOMINA (my_id_nomina out integer, my_seguro_social in integer) as 
+       begin 
+       select sec_nomica.nextval into my_id_nomina from dual;    -- INCREMENTABLE 
+       insert into nomina (id_nomina, seguro_social)
+       values (my_id_nomina, my_seguro_social);
+       end;
+       /
+       
+       
+       -- QUE MUESTRE EL PROCEDIMIENTO PARA LLENAR LAS DOS TABLAS AL MISMO TIEMPO... PENDIENTEEE! 
+    
+    create or replace procedure ALTA_NOMINA (my_id in integer, my_nombre in varchar2, my_paterno in varchar2, my_id_nomina out integer, my_seguro_social in integer) 
+    as
+    begin 
+    select ALTA_NOMINA.nextval into alta_nomina from dual;
+    insert into trabajador values (my_id, my_nombre, my_paterno);
+    insert into nomina values (my_id_nomina, my_seguro_social);
+    end;
+       /
+      
+      declare 
+      valor integer;
+      begin
+     GUARDAR_TRABAJADOR ( 102, 'Juan', 'Franky');
+      GUARDAR_NOMINA (valor, 102);
+      end;
+      /
+      select *from trabajador;
+      select * from nomina;
+      
+    
+      
+              
