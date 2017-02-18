@@ -1,0 +1,130 @@
+set serveroutput on;
+
+create table dance (id_dance integer,  nombre varchar2 (20), edad integer,
+constraint pk_id_dance primary key (id_dance));
+
+insert into dance values (1, 'Juan', 16);
+insert into dance values (2, 'Pedro', 20);
+insert into dance values (3, 'Luis', 45);
+insert into dance values (4, 'Jose', 70);
+
+select * from dance;
+
+declare
+estatus varchar2 (20);
+cursor cur1 IS select * from dance;
+begin 
+
+FOR rec IN cur1 LOOP
+IF rec.edad <18 then 
+estatus:= 'precoz';
+
+dbms_output.put_line ('nombre '|| rec.nombre||' edad '||rec.edad||' estatus '||estatus);
+
+END IF;
+END LOOP;
+END;
+/
+
+
+.........................................................
+
+
+create table trabajador (seguro integer,  nombre varchar2 (25), edad integer,
+constraint pk_seguro primary key (seguro));
+
+create table nomina (id_nomina integer, seguro integer, sueldo_base float, horas_laboradas integer, fecha_pago date, 
+constraint pk_id_nomina primary key (id_nomina), constraint fk_seguro foreign key (seguro) references trabajador);
+
+select * from trabajador;
+select * from nomina;
+
+insert into trabajador values (1, 'Ana', 28);
+insert into trabajador values (2, 'Pedro', 40);
+insert into trabajador values (3, 'Juan', 35);
+insert into trabajador values (4, 'Karla', 41);
+
+
+insert into nomina (id_nomina, seguro, sueldo_base)  values (1, 1, 6000);
+insert into nomina   (id_nomina, seguro, sueldo_base) values (2, 2, 8000);
+insert into nomina   (id_nomina, seguro, sueldo_base)  values (3, 3,7000);
+insert into nomina  (id_nomina, seguro, sueldo_base)  values (4,4, 10000);
+
+
+
+
+create sequence sec_nomina
+start with 1
+increment by 1
+nomaxvalue;
+
+create or replace procedure guardar_nomina (my_id_nomina out integer, my_seguro in integer, my_sueldo_base in integer) 
+as
+begin
+select sec_nomina.nextval  into my_id_nomina from dual;
+insert into nomina (id_nomina, seguro, sueldo_base)
+values (my_id_nomina, my_seguro, my_sueldo_base);
+end;
+/
+
+create or replace procedure generador_trabajador (my_seguro in integer, my_nombre in varchar2, my_edad in integer, my_id_nomina out integer,
+my_sueldo_base in float) as
+begin
+insert into trabajador values (my_seguro, my_nombre,my_edad);
+guardar_nomina (my_id_nomina, my_seguro, my_sueldo_base);
+end;
+/
+
+declare  
+valor integer;
+begin
+generador_trabajador(1,'Ana',28,valor,6000);
+generador_trabajador(2,'Pedro',40,valor,8000);
+generador_trabajador(3,'Juan',35,valor,7000);
+generador_trabajador(4,'Karla',41,valor,10000);
+generador_trabajador(5,'A',25,valor,60000);
+end;
+/
+
+select * from trabajador;
+select * from nomina;
+
+-- ESTRUCTURA DE UN CURSOS BASICO
+
+declare 
+cursor cur_1 is (select * from trabajador);
+cursor cur_2 is (select * from nomina);
+
+begin
+
+for gato in cur_1 loop
+for perro in cur_2 loop
+
+if perro.seguro=gato.seguro then 
+
+DBMS_output.put_line(' NOMBRE '|| gato.nombre||' EDAD '||gato.edad || ' Sueldo Base '|| perro.sueldo_base);
+end if;
+end loop;
+end loop;
+end;
+/        
+set serveroutput on;
+
+select * from nomina;
+
+
+
+-- PARA TODA LA FILA, LLENAR O VACIAR ALGO MASIVO
+-- EN UN CURSOR PARA CAMBIAR ALGO SIEMPRE ES UPDATE Y CURRENT Y EL NOMBRE DEL CURSOR 
+declare 
+cursor cur_3 is (select * from nomina) for update;
+begin
+for gato in cur_3 loop
+
+
+update nomina set horas_laboradas = 40 where current of cur_3;   -- Donde se encuentre el cursor current 
+
+end loop;
+end;
+/
+select * from nomina;
