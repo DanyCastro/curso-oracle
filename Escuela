@@ -1,7 +1,8 @@
 create table alumno (Cuenta_Alumno integer primary key, nombre varchar2 (25), paterno varchar2 (25));
-create table materia (id_materia integer, nombre varchar2 (20), constraint pk_id_materia primary key (id_materia));
+create table materia (id_materia integer, nombre varchar2 (120), constraint pk_id_materia primary key (id_materia));
 create table evaluacion (numero_cuenta integer, id_materia integer, calificacion float, estatus char, constraint fk_numero_cuemta foreign key (numero_cuenta) references Alumno,
 constraint fk_id_materia foreign key (id_materia) references materia);
+
 
 
 -- SECUENCIA MATERIA
@@ -11,3 +12,28 @@ increment by 1
 nomaxvalue;
 
 -- PROCEDIMIENTO 
+-- OUT ARTIFICIAL
+-- IN NATURAL
+
+create or replace procedure guardar_materia(my_id_materia out integer, my_nombre in varchar2) 
+as
+begin
+select sec_materia.nextval  into my_id_materia from dual;
+insert into materia 
+values (my_id_materia, my_nombre);
+end;
+/
+
+declare  
+valor integer;
+begin
+guardar_materia(Valor, 'Base de Datos II');
+guardar_materia(Valor, 'Negocios Electronicos');
+guardar_materia(Valor, 'Metodologia Estructurada');
+end;
+/
+
+select * from Alumno;
+select * from Materia;
+
+
