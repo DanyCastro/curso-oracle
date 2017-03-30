@@ -1,0 +1,13 @@
+create table alumno (Cuenta_Alumno integer primary key, nombre varchar2 (25), paterno varchar2 (25));
+create table materia (id_materia integer, nombre varchar2 (20), constraint pk_id_materia primary key (id_materia));
+create table evaluacion (numero_cuenta integer, id_materia integer, calificacion float, estatus char, constraint fk_numero_cuemta foreign key (numero_cuenta) references Alumno,
+constraint fk_id_materia foreign key (id_materia) references materia);
+
+
+-- SECUENCIA MATERIA
+create sequence sec_materia
+start with 1
+increment by 1
+nomaxvalue;
+
+-- PROCEDIMIENTO 
